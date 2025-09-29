@@ -97,12 +97,16 @@
       <section class="search-section">
         <h1 class="search-title">How's the sky looking today?</h1>
         <div class="search-container">
-          <input 
-            type="text" 
-            class="search-input" 
-            placeholder="Search for a city, e.g., New York"
-            id="searchInput"
-          >
+          <div class="search-input-wrapper">
+            <input 
+              type="text" 
+              class="search-input" 
+              placeholder="Search for a city, e.g., New York"
+              id="searchInput"
+              autocomplete="off"
+            >
+            <div class="search-suggestions" id="searchSuggestions"></div>
+          </div>
           <button class="search-button" id="searchButton">
             <img src="./assets/images/icon-search.svg" alt="Search">
             <span>Search</span>
@@ -171,7 +175,9 @@
 
       <!-- Loading State -->
       <div class="loading-state" id="loadingState">
-        <img src="./assets/images/icon-loading.svg" alt="Loading" class="loading-icon">
+        <div class="loading-spinner">
+          <div class="spinner"></div>
+        </div>
         <p>Loading weather data...</p>
       </div>
 
@@ -196,8 +202,8 @@
 
     <!-- Attribution -->
     <div class="attribution">
-      Challenge by <a href="https://www.frontendmentor.io?ref=challenge">Frontend Mentor</a>. 
-      Coded by <a href="#">Your Name Here</a>.
+      Challenge by <a href="https://www.frontendmentor.io?ref=challenge" target="_blank">Frontend Mentor</a>. 
+      Coded by <a href="#" target="_blank">TMB</a>.
     </div>
   </div>
 

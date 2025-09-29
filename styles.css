@@ -20,7 +20,7 @@
   font-display: swap;
 }
 
-/* CSS Custom Properties */
+/* CSS Custom Properties - Exact colors from style guide */
 :root {
   /* Colors */
   --neutral-900: hsl(243, 96%, 9%);
@@ -83,6 +83,7 @@ body {
 .header {
   padding: var(--spacing-md) var(--spacing-sm);
   border-bottom: 1px solid var(--neutral-800);
+  background: var(--neutral-900);
 }
 
 .header-content {
@@ -95,6 +96,7 @@ body {
 
 .logo {
   height: 32px;
+  width: auto;
 }
 
 /* Units Dropdown */
@@ -109,7 +111,7 @@ body {
   background: var(--neutral-800);
   border: 1px solid var(--neutral-700);
   border-radius: var(--radius-sm);
-  padding: var(--spacing-xs) var(--spacing-sm);
+  padding: 12px var(--spacing-sm);
   color: var(--neutral-0);
   font-family: inherit;
   font-size: 16px;
@@ -234,7 +236,7 @@ body {
 /* Main Content */
 .main {
   flex: 1;
-  padding: var(--spacing-lg) var(--spacing-sm);
+  padding: var(--spacing-xl) var(--spacing-sm);
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
@@ -250,8 +252,9 @@ body {
   font-family: var(--font-heading);
   font-size: clamp(32px, 5vw, 48px);
   font-weight: 700;
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
   color: var(--neutral-0);
+  line-height: 1.2;
 }
 
 .search-container {
@@ -259,10 +262,16 @@ body {
   gap: var(--spacing-sm);
   max-width: 600px;
   margin: 0 auto;
+  position: relative;
+}
+
+.search-input-wrapper {
+  flex: 1;
+  position: relative;
 }
 
 .search-input {
-  flex: 1;
+  width: 100%;
   padding: var(--spacing-sm) var(--spacing-md);
   background: var(--neutral-800);
   border: 1px solid var(--neutral-700);
@@ -283,6 +292,52 @@ body {
   box-shadow: 0 0 0 3px rgba(115, 130, 255, 0.1);
 }
 
+.search-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--neutral-800);
+  border: 1px solid var(--neutral-700);
+  border-top: none;
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 100;
+  display: none;
+}
+
+.search-suggestions.visible {
+  display: block;
+}
+
+.suggestion-item {
+  padding: var(--spacing-sm) var(--spacing-md);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+  border-bottom: 1px solid var(--neutral-700);
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.suggestion-item:hover,
+.suggestion-item.highlighted {
+  background: var(--neutral-700);
+}
+
+.suggestion-name {
+  font-weight: 500;
+  color: var(--neutral-0);
+}
+
+.suggestion-details {
+  font-size: 14px;
+  color: var(--neutral-300);
+  margin-top: 2px;
+}
+
 .search-button {
   display: flex;
   align-items: center;
@@ -297,6 +352,7 @@ body {
   font-weight: 600;
   cursor: pointer;
   transition: all var(--transition-normal);
+  white-space: nowrap;
 }
 
 .search-button:hover {
@@ -335,10 +391,16 @@ body {
 /* Weather Content */
 .weather-content {
   display: none;
+  animation: fadeIn 0.5s ease-in-out;
 }
 
 .weather-content.visible {
   display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Current Weather */
@@ -368,7 +430,7 @@ body {
 .current-weather-main {
   display: flex;
   align-items: center;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-xl);
   margin-bottom: var(--spacing-xl);
   position: relative;
   z-index: 1;
@@ -394,17 +456,20 @@ body {
   font-weight: 700;
   line-height: 1;
   margin-bottom: var(--spacing-sm);
+  color: var(--neutral-0);
 }
 
 .location {
   font-size: 24px;
   font-weight: 600;
   margin-bottom: var(--spacing-xs);
+  color: var(--neutral-0);
 }
 
 .date-time {
   font-size: 16px;
   color: var(--neutral-300);
+  font-weight: 300;
 }
 
 /* Weather Metrics */
@@ -422,17 +487,20 @@ body {
   background: rgba(255, 255, 255, 0.05);
   border-radius: var(--radius-md);
   backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .metric-label {
   font-size: 14px;
   color: var(--neutral-300);
   margin-bottom: var(--spacing-xs);
+  font-weight: 300;
 }
 
 .metric-value {
   font-size: 24px;
   font-weight: 700;
+  color: var(--neutral-0);
 }
 
 /* Section Titles */
@@ -441,6 +509,7 @@ body {
   font-size: 32px;
   font-weight: 700;
   margin-bottom: var(--spacing-lg);
+  color: var(--neutral-0);
 }
 
 /* Daily Forecast */
@@ -468,6 +537,7 @@ body {
   background: var(--neutral-700);
   border-color: var(--neutral-600);
   transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .forecast-day.today {
@@ -484,6 +554,7 @@ body {
   font-size: 14px;
   color: var(--neutral-300);
   margin-bottom: var(--spacing-xs);
+  font-weight: 500;
 }
 
 .forecast-day.today .forecast-date {
@@ -507,11 +578,13 @@ body {
 .forecast-high {
   font-weight: 700;
   font-size: 18px;
+  color: var(--neutral-0);
 }
 
 .forecast-low {
   color: var(--neutral-300);
   font-size: 16px;
+  font-weight: 500;
 }
 
 .forecast-day.today .forecast-low {
@@ -533,7 +606,7 @@ body {
 
 .day-button {
   flex-shrink: 0;
-  padding: var(--spacing-xs) var(--spacing-sm);
+  padding: 12px var(--spacing-sm);
   background: var(--neutral-800);
   border: 1px solid var(--neutral-700);
   border-radius: var(--radius-sm);
@@ -549,6 +622,7 @@ body {
 .day-button:hover {
   background: var(--neutral-700);
   color: var(--neutral-0);
+  border-color: var(--neutral-600);
 }
 
 .day-button.active {
@@ -557,8 +631,14 @@ body {
   color: var(--neutral-0);
 }
 
+.day-button.active:hover {
+  background: var(--blue-700);
+  border-color: var(--blue-700);
+}
+
 .hourly-chart {
   background: var(--neutral-800);
+  border: 1px solid var(--neutral-700);
   border-radius: var(--radius-md);
   padding: var(--spacing-lg);
   overflow-x: auto;
@@ -575,17 +655,19 @@ body {
   text-align: center;
   padding: var(--spacing-sm);
   border-radius: var(--radius-sm);
-  transition: background-color var(--transition-fast);
+  transition: all var(--transition-fast);
 }
 
 .hourly-item:hover {
   background: var(--neutral-700);
+  transform: translateY(-2px);
 }
 
 .hourly-time {
   font-size: 12px;
   color: var(--neutral-300);
   margin-bottom: var(--spacing-xs);
+  font-weight: 500;
 }
 
 .hourly-icon {
@@ -599,6 +681,7 @@ body {
   font-size: 14px;
   font-weight: 600;
   margin-top: var(--spacing-xs);
+  color: var(--neutral-0);
 }
 
 /* Loading State */
@@ -606,22 +689,36 @@ body {
   display: none;
   text-align: center;
   padding: var(--spacing-2xl);
+  animation: fadeIn 0.3s ease-in-out;
 }
 
 .loading-state.visible {
   display: block;
 }
 
-.loading-icon {
+.loading-spinner {
+  margin-bottom: var(--spacing-md);
+}
+
+.spinner {
   width: 48px;
   height: 48px;
-  margin-bottom: var(--spacing-md);
+  border: 4px solid var(--neutral-700);
+  border-top: 4px solid var(--blue-500);
+  border-radius: 50%;
   animation: spin 1s linear infinite;
+  margin: 0 auto;
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-state p {
+  color: var(--neutral-300);
+  font-size: 16px;
+  font-weight: 500;
 }
 
 /* Error States */
@@ -630,6 +727,7 @@ body {
   display: none;
   text-align: center;
   padding: var(--spacing-2xl);
+  animation: fadeIn 0.3s ease-in-out;
 }
 
 .error-state.visible,
@@ -649,6 +747,7 @@ body {
   font-size: 24px;
   font-weight: 700;
   margin-bottom: var(--spacing-sm);
+  color: var(--neutral-0);
 }
 
 .error-state p,
@@ -658,6 +757,8 @@ body {
   max-width: 400px;
   margin-left: auto;
   margin-right: auto;
+  font-weight: 300;
+  line-height: 1.6;
 }
 
 .retry-button {
@@ -678,6 +779,12 @@ body {
 
 .retry-button:hover {
   background: var(--blue-700);
+  transform: translateY(-1px);
+}
+
+.retry-button:focus {
+  outline: 2px solid var(--blue-500);
+  outline-offset: 2px;
 }
 
 .retry-button img {
@@ -692,12 +799,14 @@ body {
   font-size: 14px;
   color: var(--neutral-300);
   border-top: 1px solid var(--neutral-800);
+  margin-top: auto;
 }
 
 .attribution a {
   color: var(--blue-500);
   text-decoration: none;
   transition: color var(--transition-fast);
+  font-weight: 500;
 }
 
 .attribution a:hover {
@@ -752,6 +861,10 @@ body {
     left: 0;
     min-width: 260px;
   }
+  
+  .section-title {
+    font-size: 28px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -768,7 +881,19 @@ body {
   }
   
   .day-button {
-    padding: 6px 12px;
+    padding: 8px 12px;
     font-size: 12px;
+  }
+  
+  .search-title {
+    font-size: 28px;
+  }
+  
+  .current-temperature {
+    font-size: 48px;
+  }
+  
+  .location {
+    font-size: 20px;
   }
 }

@@ -10,6 +10,8 @@ class WeatherApp {
       precipitation: 'mm'
     };
     this.selectedDay = 0;
+    this.searchTimeout = null;
+    this.selectedSuggestionIndex = -1;
     
     this.initializeElements();
     this.bindEvents();
@@ -21,6 +23,7 @@ class WeatherApp {
     this.searchInput = document.getElementById('searchInput');
     this.searchButton = document.getElementById('searchButton');
     this.searchStatus = document.getElementById('searchStatus');
+    this.searchSuggestions = document.getElementById('searchSuggestions');
     
     // Units elements
     this.unitsToggle = document.getElementById('unitsToggle');
@@ -52,7 +55,27 @@ class WeatherApp {
     // Search events
     this.searchButton.addEventListener('click', () => this.handleSearch());
     this.searchInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') this.handleSearch();
+      if (e.key === 'Enter') {
+        if (this.selectedSuggestionIndex >= 0) {
+          this.selectSuggestion(this.selectedSuggestionIndex);
+        } else {
+          this.handleSearch();
+        }
+      }
+    });
+    
+    // Search suggestions
+    this.searchInput.addEventListener('input', (e) => {
+      this.handleSearchInput(e.target.value);
+    });
+    
+    this.searchInput.addEventListener('keydown', (e) => {
+      this.handleSearchKeydown(e);
+    });
+    
+    this.searchInput.addEventListener('blur', () => {
+      // Delay hiding suggestions to allow for clicks
+      setTimeout(() => this.hideSuggestions(), 150);
     });
     
     // Units dropdown events
@@ -103,10 +126,120 @@ class WeatherApp {
     }
   }
 
+  handleSearchInput(query) {
+    clearTimeout(this.searchTimeout);
+    
+    if (query.length < 2) {
+      this.hideSuggestions();
+      return;
+    }
+    
+    this.searchTimeout = setTimeout(() => {
+      this.fetchSuggestions(query);
+    }, 300);
+  }
+
+  async fetchSuggestions(query) {
+    try {
+      const response = await fetch(
+        `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=5&language=en&format=json`
+      );
+      const data = await response.json();
+      
+      if (data.results && data.results.length > 0) {
+        this.displaySuggestions(data.results);
+      } else {
+        this.hideSuggestions();
+      }
+    } catch (error) {
+      console.error('Suggestions fetch error:', error);
+      this.hideSuggestions();
+    }
+  }
+
+  displaySuggestions(suggestions) {
+    this.searchSuggestions.innerHTML = '';
+    this.selectedSuggestionIndex = -1;
+    
+    suggestions.forEach((suggestion, index) => {
+      const item = document.createElement('div');
+      item.className = 'suggestion-item';
+      item.dataset.index = index;
+      
+      const name = document.createElement('div');
+      name.className = 'suggestion-name';
+      name.textContent = suggestion.name;
+      
+      const details = document.createElement('div');
+      details.className = 'suggestion-details';
+      details.textContent = `${suggestion.admin1 ? suggestion.admin1 + ', ' : ''}${suggestion.country}`;
+      
+      item.appendChild(name);
+      item.appendChild(details);
+      
+      item.addEventListener('click', () => {
+        this.selectSuggestion(index, suggestions);
+      });
+      
+      this.searchSuggestions.appendChild(item);
+    });
+    
+    this.searchSuggestions.classList.add('visible');
+    this.searchSuggestions.suggestions = suggestions;
+  }
+
+  handleSearchKeydown(e) {
+    const suggestions = this.searchSuggestions.querySelectorAll('.suggestion-item');
+    
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      this.selectedSuggestionIndex = Math.min(this.selectedSuggestionIndex + 1, suggestions.length - 1);
+      this.highlightSuggestion();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      this.selectedSuggestionIndex = Math.max(this.selectedSuggestionIndex - 1, -1);
+      this.highlightSuggestion();
+    } else if (e.key === 'Escape') {
+      this.hideSuggestions();
+      this.searchInput.blur();
+    }
+  }
+
+  highlightSuggestion() {
+    const suggestions = this.searchSuggestions.querySelectorAll('.suggestion-item');
+    suggestions.forEach((item, index) => {
+      item.classList.toggle('highlighted', index === this.selectedSuggestionIndex);
+    });
+  }
+
+  selectSuggestion(index, suggestionsData = null) {
+    const suggestions = suggestionsData || this.searchSuggestions.suggestions;
+    if (!suggestions || !suggestions[index]) return;
+    
+    const suggestion = suggestions[index];
+    const locationName = `${suggestion.name}${suggestion.admin1 ? ', ' + suggestion.admin1 : ''}${suggestion.country ? ', ' + suggestion.country : ''}`;
+    
+    this.searchInput.value = locationName;
+    this.currentLocation = {
+      name: locationName,
+      lat: suggestion.latitude,
+      lon: suggestion.longitude
+    };
+    
+    this.hideSuggestions();
+    this.fetchWeatherData();
+  }
+
+  hideSuggestions() {
+    this.searchSuggestions.classList.remove('visible');
+    this.selectedSuggestionIndex = -1;
+  }
+
   async handleSearch() {
     const query = this.searchInput.value.trim();
     if (!query) return;
     
+    this.hideSuggestions();
     this.showLoading();
     this.setSearchStatus('Searching...', 'searching');
     
