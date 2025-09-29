@@ -1,12 +1,7 @@
-{
-  "name": "project",
-  "version": "1.0.0",
-  "description": "![Design preview for the Weather app coding challenge](./preview.jpg)",
-  "main": "script.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
-}
+@@ .. @@
+   "scripts": {
+-    "test": "echo \"Error: no test specified\" && exit 1"
++    "test": "echo \"Error: no test specified\" && exit 1",
++    "start": "serve . -p 3000",
++    "dev": "serve . -p 3000"
+   },
