@@ -628,6 +628,15 @@ class WeatherApp {
   setSearchStatus(message, type = '') {
     this.searchStatus.textContent = message;
     this.searchStatus.className = `search-status ${type}`;
+    
+    // Add loading spinner for searching state
+    if (type === 'searching') {
+      const spinner = document.createElement('div');
+      spinner.className = 'search-loading-spinner';
+      this.searchStatus.innerHTML = '';
+      this.searchStatus.appendChild(spinner);
+      this.searchStatus.appendChild(document.createTextNode(' ' + message));
+    }
   }
 
   showLoading() {
