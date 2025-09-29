@@ -112,17 +112,32 @@ class WeatherApp {
           },
           () => {
             // Fallback to New York
-            this.searchInput.value = 'New York';
-            this.handleSearch();
+            this.currentLocation = {
+              name: 'New York, NY, United States',
+              lat: 40.7128,
+              lon: -74.0060
+            };
+            this.searchInput.value = 'New York, NY, United States';
+            this.fetchWeatherData();
           }
         );
       } else {
-        this.searchInput.value = 'New York';
-        this.handleSearch();
+        this.currentLocation = {
+          name: 'New York, NY, United States',
+          lat: 40.7128,
+          lon: -74.0060
+        };
+        this.searchInput.value = 'New York, NY, United States';
+        this.fetchWeatherData();
       }
     } catch (error) {
-      this.searchInput.value = 'New York';
-      this.handleSearch();
+      this.currentLocation = {
+        name: 'New York, NY, United States',
+        lat: 40.7128,
+        lon: -74.0060
+      };
+      this.searchInput.value = 'New York, NY, United States';
+      this.fetchWeatherData();
     }
   }
 
@@ -142,8 +157,13 @@ class WeatherApp {
   async fetchSuggestions(query) {
     try {
       const response = await fetch(
-        `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=5&language=en&format=json`
+        `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=8&language=en&format=json`
       );
+      
+      if (!response.ok) {
+        throw new Error('Geocoding API request failed');
+      }
+      
       const data = await response.json();
       
       if (data.results && data.results.length > 0) {
@@ -172,7 +192,10 @@ class WeatherApp {
       
       const details = document.createElement('div');
       details.className = 'suggestion-details';
-      details.textContent = `${suggestion.admin1 ? suggestion.admin1 + ', ' : ''}${suggestion.country}`;
+      const locationParts = [];
+      if (suggestion.admin1) locationParts.push(suggestion.admin1);
+      if (suggestion.country) locationParts.push(suggestion.country);
+      details.textContent = locationParts.join(', ');
       
       item.appendChild(name);
       item.appendChild(details);
@@ -227,7 +250,13 @@ class WeatherApp {
     };
     
     this.hideSuggestions();
-    this.fetchWeatherData();
+    this.showLoading();
+    this.setSearchStatus('Loading weather data...', 'searching');
+    this.fetchWeatherData().then(() => {
+      this.setSearchStatus('');
+    }).catch(() => {
+      this.setSearchStatus('Failed to load weather data', 'error');
+    });
   }
 
   hideSuggestions() {
@@ -244,14 +273,25 @@ class WeatherApp {
     this.setSearchStatus('Searching...', 'searching');
     
     try {
-      const location = await this.geocodeLocation(query);
-      if (!location) {
+      // First try to get suggestions and use the first result
+      const response = await fetch(
+        `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=1&language=en&format=json`
+      );
+      const data = await response.json();
+      
+      if (!data.results || data.results.length === 0) {
         this.showNoResults();
         this.setSearchStatus('No results found', 'error');
         return;
       }
       
-      this.currentLocation = location;
+      const result = data.results[0];
+      this.currentLocation = {
+        name: `${result.name}${result.admin1 ? ', ' + result.admin1 : ''}${result.country ? ', ' + result.country : ''}`,
+        lat: result.latitude,
+        lon: result.longitude
+      };
+      
       await this.fetchWeatherData();
       this.setSearchStatus('');
     } catch (error) {
@@ -263,15 +303,19 @@ class WeatherApp {
 
   async searchByCoordinates(lat, lon) {
     this.showLoading();
+    this.setSearchStatus('Getting your location...', 'searching');
     
     try {
       // Reverse geocode to get location name
       const location = await this.reverseGeocode(lat, lon);
       this.currentLocation = location || { name: 'Current Location', lat, lon };
+      this.searchInput.value = this.currentLocation.name;
       await this.fetchWeatherData();
+      this.setSearchStatus('');
     } catch (error) {
       console.error('Location search error:', error);
       this.showError('Unable to fetch weather data for your location.');
+      this.setSearchStatus('Location failed', 'error');
     }
   }
 
@@ -299,23 +343,19 @@ class WeatherApp {
 
   async reverseGeocode(lat, lon) {
     try {
-      const response = await fetch(
-        `https://geocoding-api.open-meteo.com/v1/search?latitude=${lat}&longitude=${lon}&count=1&language=en&format=json`
-      );
-      const data = await response.json();
-      
-      if (data.results && data.results.length > 0) {
-        const result = data.results[0];
-        return {
-          name: `${result.name}${result.admin1 ? ', ' + result.admin1 : ''}${result.country ? ', ' + result.country : ''}`,
-          lat: result.latitude,
-          lon: result.longitude
-        };
-      }
-      return null;
+      // Use a reverse geocoding service or fallback to coordinates
+      return {
+        name: `Location (${lat.toFixed(2)}, ${lon.toFixed(2)})`,
+        lat: lat,
+        lon: lon
+      };
     } catch (error) {
       console.error('Reverse geocoding error:', error);
-      return null;
+      return {
+        name: `Location (${lat.toFixed(2)}, ${lon.toFixed(2)})`,
+        lat: lat,
+        lon: lon
+      };
     }
   }
 
@@ -329,7 +369,7 @@ class WeatherApp {
       const precipUnit = this.units.precipitation === 'in' ? 'inch' : 'mm';
       
       const response = await fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m&hourly=temperature_2m,weather_code,precipitation&daily=weather_code,temperature_2m_max,temperature_2m_min&temperature_unit=${tempUnit}&wind_speed_unit=${windUnit}&precipitation_unit=${precipUnit}&timezone=auto&forecast_days=7`
+        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m&hourly=temperature_2m,weather_code,precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min&temperature_unit=${tempUnit}&wind_speed_unit=${windUnit}&precipitation_unit=${precipUnit}&timezone=auto&forecast_days=7`
       );
       
       if (!response.ok) {
@@ -351,7 +391,7 @@ class WeatherApp {
     const { current, daily, hourly } = this.weatherData;
     
     // Update current weather
-    this.currentLocation.textContent = this.currentLocation.name;
+    document.getElementById('currentLocation').textContent = this.currentLocation.name;
     this.updateDateTime();
     
     const tempSymbol = this.units.temperature === 'fahrenheit' ? '°F' : '°C';
