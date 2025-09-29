@@ -2,65 +2,205 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- displays site properly based on user's device -->
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" sizes="32x32" href="./assets/images/favicon-32x32.png">
-  
   <title>Frontend Mentor | Weather app</title>
-
-  <!-- Feel free to remove these styles or customise in your own stylesheet 👍 -->
-  <style>
-    .attribution { font-size: 11px; text-align: center; }
-    .attribution a { color: hsl(228, 45%, 44%); }
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <div class="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-content">
+        <img src="./assets/images/logo.svg" alt="Weather App" class="logo">
+        
+        <!-- Units Dropdown -->
+        <div class="units-dropdown">
+          <button class="units-toggle" id="unitsToggle">
+            <img src="./assets/images/icon-units.svg" alt="Units" class="units-icon">
+            <span>Units</span>
+            <img src="./assets/images/icon-dropdown.svg" alt="Dropdown" class="dropdown-icon">
+          </button>
+          
+          <div class="units-menu" id="unitsMenu">
+            <div class="units-section">
+              <h3>Switch to Imperial/Metric</h3>
+              <div class="unit-options">
+                <label class="unit-option">
+                  <input type="radio" name="system" value="metric" checked>
+                  <span class="checkmark"></span>
+                  Metric
+                </label>
+                <label class="unit-option">
+                  <input type="radio" name="system" value="imperial">
+                  <span class="checkmark"></span>
+                  Imperial
+                </label>
+              </div>
+            </div>
+            
+            <div class="units-section">
+              <h3>Temperature</h3>
+              <div class="unit-options">
+                <label class="unit-option">
+                  <input type="radio" name="temperature" value="celsius" checked>
+                  <span class="checkmark"></span>
+                  Celsius (°C)
+                </label>
+                <label class="unit-option">
+                  <input type="radio" name="temperature" value="fahrenheit">
+                  <span class="checkmark"></span>
+                  Fahrenheit (°F)
+                </label>
+              </div>
+            </div>
+            
+            <div class="units-section">
+              <h3>Wind Speed</h3>
+              <div class="unit-options">
+                <label class="unit-option">
+                  <input type="radio" name="windSpeed" value="kmh" checked>
+                  <span class="checkmark"></span>
+                  km/h
+                </label>
+                <label class="unit-option">
+                  <input type="radio" name="windSpeed" value="mph">
+                  <span class="checkmark"></span>
+                  mph
+                </label>
+              </div>
+            </div>
+            
+            <div class="units-section">
+              <h3>Precipitation</h3>
+              <div class="unit-options">
+                <label class="unit-option">
+                  <input type="radio" name="precipitation" value="mm" checked>
+                  <span class="checkmark"></span>
+                  Millimeters (mm)
+                </label>
+                <label class="unit-option">
+                  <input type="radio" name="precipitation" value="in">
+                  <span class="checkmark"></span>
+                  Inches (in)
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
 
-  Units
+    <!-- Main Content -->
+    <main class="main">
+      <!-- Search Section -->
+      <section class="search-section">
+        <h1 class="search-title">How's the sky looking today?</h1>
+        <div class="search-container">
+          <input 
+            type="text" 
+            class="search-input" 
+            placeholder="Search for a city, e.g., New York"
+            id="searchInput"
+          >
+          <button class="search-button" id="searchButton">
+            <img src="./assets/images/icon-search.svg" alt="Search">
+            <span>Search</span>
+          </button>
+        </div>
+        <div class="search-status" id="searchStatus"></div>
+      </section>
 
-  Switch to Imperial/Metric
+      <!-- Weather Content -->
+      <div class="weather-content" id="weatherContent">
+        <!-- Current Weather -->
+        <section class="current-weather">
+          <div class="current-weather-main">
+            <div class="weather-icon-container">
+              <img src="" alt="" class="weather-icon" id="currentWeatherIcon">
+            </div>
+            <div class="temperature-info">
+              <div class="current-temperature" id="currentTemperature">--°</div>
+              <div class="location-info">
+                <div class="location" id="currentLocation">--</div>
+                <div class="date-time" id="currentDateTime">--</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Weather Metrics -->
+          <div class="weather-metrics">
+            <div class="metric">
+              <div class="metric-label">Feels like</div>
+              <div class="metric-value" id="feelsLike">--°</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Humidity</div>
+              <div class="metric-value" id="humidity">--%</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Wind</div>
+              <div class="metric-value" id="windSpeed">-- km/h</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Precipitation</div>
+              <div class="metric-value" id="precipitation">-- mm</div>
+            </div>
+          </div>
+        </section>
 
-  Temperature
+        <!-- Daily Forecast -->
+        <section class="daily-forecast">
+          <h2 class="section-title">Daily forecast</h2>
+          <div class="forecast-grid" id="dailyForecast">
+            <!-- Daily forecast items will be inserted here -->
+          </div>
+        </section>
 
-  Celsius (°C)
-  Fahrenheit (°F)
+        <!-- Hourly Forecast -->
+        <section class="hourly-forecast">
+          <h2 class="section-title">Hourly forecast</h2>
+          <div class="day-selector" id="daySelector">
+            <!-- Day selector buttons will be inserted here -->
+          </div>
+          <div class="hourly-chart" id="hourlyChart">
+            <!-- Hourly forecast chart will be inserted here -->
+          </div>
+        </section>
+      </div>
 
-  Wind Speed
+      <!-- Loading State -->
+      <div class="loading-state" id="loadingState">
+        <img src="./assets/images/icon-loading.svg" alt="Loading" class="loading-icon">
+        <p>Loading weather data...</p>
+      </div>
 
-  km/h
-  mph
+      <!-- Error State -->
+      <div class="error-state" id="errorState">
+        <img src="./assets/images/icon-error.svg" alt="Error" class="error-icon">
+        <h3>Something went wrong</h3>
+        <p id="errorMessage">Unable to fetch weather data. Please try again.</p>
+        <button class="retry-button" id="retryButton">
+          <img src="./assets/images/icon-retry.svg" alt="Retry">
+          Try again
+        </button>
+      </div>
 
-  Precipitation
+      <!-- No Results State -->
+      <div class="no-results-state" id="noResultsState">
+        <img src="./assets/images/icon-error.svg" alt="No results" class="error-icon">
+        <h3>No results found</h3>
+        <p>We couldn't find any weather data for that location. Please check the spelling and try again.</p>
+      </div>
+    </main>
 
-  Millimeters (mm)
-  Inches (in)
-
-  How's the sky looking today?
-
-  Search for a city, e.g., New York
-  Search
-
-  Feels like
-  <!-- Insert temperature here -->
-
-  Humidity
-  <!-- Insert humidity here -->
-
-  Wind
-  <!-- Insert wind here -->   
-  
-  Precipitation
-  <!-- Insert precipitation here -->
-
-  Daily forecast
-  <!-- Insert daily forecast for the next 7 days here -->
-
-  Hourly forecast
-  <!-- Insert hourly forecast for the selected day here -->
-
-  <div class="attribution">
-    Challenge by <a href="https://www.frontendmentor.io?ref=challenge">Frontend Mentor</a>. 
-    Coded by <a href="#">Your Name Here</a>.
+    <!-- Attribution -->
+    <div class="attribution">
+      Challenge by <a href="https://www.frontendmentor.io?ref=challenge">Frontend Mentor</a>. 
+      Coded by <a href="#">Your Name Here</a>.
+    </div>
   </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
